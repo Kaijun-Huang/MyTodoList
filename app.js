@@ -67,7 +67,7 @@ app.get("/todos/:id/edit", (req, res) => {
 
 //Update
 app.post("/todos/:id/edit", (req, res) => {
-  const id = req.params.id;
+  const id = req.params.id; //id, name都來自客戶端(req)
   const name = req.body.name; //使用者送進來的name
   return Todo.findById(id)
     .then((todo) => {
@@ -75,6 +75,15 @@ app.post("/todos/:id/edit", (req, res) => {
       return todo.save(); //要return出來才能繼續接then, 如果是非同步的事情, 我們盡量把事件return出來
     })
     .then(() => res.redirect(`/todos/${id}`)) //導到detail page
+    .catch((error) => console.log(error));
+});
+
+//delete
+app.post("/todos/:id/delete", (req, res) => {
+  const id = req.params.id;
+  return Todo.findById(id)
+    .then((todo) => todo.remove())
+    .then(() => res.redirect("/"))
     .catch((error) => console.log(error));
 });
 
