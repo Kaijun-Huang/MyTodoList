@@ -24,6 +24,8 @@ app.set("view engine", "hbs");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//--------------------------------route
+//瀏覽所有todo
 app.get("/", (req, res) => {
   Todo.find()
     .lean()
@@ -31,6 +33,7 @@ app.get("/", (req, res) => {
     .catch((error) => console.error(error));
 });
 
+//create, 顯示new page
 app.get("/todos/new", (req, res) => {
   return res.render("new");
 });
@@ -46,7 +49,7 @@ app.post("/todos", (req, res) => {
   //   .catch((error) => console.error("error"));
 });
 
-//read
+//read 瀏覽特定todo
 app.get("/todos/:id", (req, res) => {
   //detail page
   const id = req.params.id;
@@ -56,7 +59,7 @@ app.get("/todos/:id", (req, res) => {
     .catch((error) => console.log("error"));
 });
 
-//按edit導到edit畫面, 並帶上name在輸入框
+// update, 修改特定todo, 按edit導到edit畫面, 並帶上name在輸入框
 app.get("/todos/:id/edit", (req, res) => {
   const id = req.params.id;
   return Todo.findById(id) //在Todo裡找這個id的那筆資料, 給edit頁面render, 用todo.name取用
@@ -65,13 +68,15 @@ app.get("/todos/:id/edit", (req, res) => {
     .catch((error) => console.log(error));
 });
 
-//Update
+//update, 修改特定todo
 app.post("/todos/:id/edit", (req, res) => {
   const id = req.params.id; //id, name都來自客戶端(req)
-  const name = req.body.name; //使用者送進來的name
+  // const name = req.body.name; //使用者送進來的name
+  const { name, isDone } = req.body; //解構賦值法
   return Todo.findById(id)
     .then((todo) => {
       todo.name = name; //把資料庫的name賦值成使用者送進來的name
+      todo.isDone = isDone === "on"; //先執行isDone === 'on' 為true
       return todo.save(); //要return出來才能繼續接then, 如果是非同步的事情, 我們盡量把事件return出來
     })
     .then(() => res.redirect(`/todos/${id}`)) //導到detail page
