@@ -55,6 +55,7 @@ app.get("/todos/:id", (req, res) => {
   const id = req.params.id;
   Todo.findById(id)
     .lean()
+    .sort({ _id: "asc" }) // 新增這裡：根據 _id 升冪排序
     .then((todo) => res.render("detail", { todo }))
     .catch((error) => console.log("error"));
 });
