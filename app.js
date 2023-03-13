@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const Todo = require("./models/todo");
 const bodyParser = require("body-parser");
+const methodOverride = require("method-override");
 const db = mongoose.connection;
 db.on("error", () => {
   console.log("mongodb error!");
@@ -22,6 +23,7 @@ const exphbs = require("express-handlebars");
 app.engine("hbs", exphbs({ defaultLayout: "main", extname: ".hbs" }));
 app.set("view engine", "hbs");
 
+app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //--------------------------------route
@@ -70,7 +72,7 @@ app.get("/todos/:id/edit", (req, res) => {
 });
 
 //update, 修改特定todo
-app.post("/todos/:id/edit", (req, res) => {
+app.put("/todos/:id", (req, res) => {
   const id = req.params.id; //id, name都來自客戶端(req)
   // const name = req.body.name; //使用者送進來的name
   const { name, isDone } = req.body; //解構賦值法
@@ -85,7 +87,7 @@ app.post("/todos/:id/edit", (req, res) => {
 });
 
 //delete
-app.post("/todos/:id/delete", (req, res) => {
+app.delete("/todos/:id", (req, res) => {
   const id = req.params.id;
   return Todo.findById(id)
     .then((todo) => todo.remove())
